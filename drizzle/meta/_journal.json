@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "mysql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1777356203961,
+      "tag": "0000_watery_shiva",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1777356365647,
+      "tag": "0001_rare_dagger",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1777362904834,
+      "tag": "0002_redundant_george_stacy",
+      "breakpoints": true
+    }
+  ]
+}
