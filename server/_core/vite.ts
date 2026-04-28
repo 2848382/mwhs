@@ -48,8 +48,23 @@ export async function setupVite(app: Express, server: Server) {
 }
 
 export function serveStatic(app: Express) {
-  const distPath = path.resolve(process.cwd(), "dist", "public");
+  // Use import.meta.url to get the absolute path of the bundled file.
+  // After esbuild bundles server/_core/index.ts to dist/index.js, this file
+  // lives at <app-root>/dist/index.js. We navigate up two levels from the
+  // bundled file's directory (dist/) to reach the app root, then resolve to
+  // dist/public from there.
+  const bundledFileUrl = new URL(import.meta.url);
+  const bundledFilePath = bundledFileUrl.pathname;
+  // bundledFilePath is e.g. /app/dist/index.js — go up one level to get dist/,
+  // then up one more to get the app root.
+  const appRoot = path.resolve(path.dirname(bundledFilePath), "..");
+  const distPath = path.resolve(appRoot, "dist", "public");
+
+  console.log(`[serveStatic] import.meta.url: ${import.meta.url}`);
+  console.log(`[serveStatic] bundledFilePath: ${bundledFilePath}`);
+  console.log(`[serveStatic] appRoot: ${appRoot}`);
   console.log(`[serveStatic] Resolved distPath: ${distPath}`);
+  console.log(`[serveStatic] Directory exists: ${fs.existsSync(distPath)}`);
 
   if (!fs.existsSync(distPath)) {
     console.error(
