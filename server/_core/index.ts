@@ -1,9 +1,7 @@
 import "dotenv/config";
 import express from "express";
-import fs from "fs";
 import { createServer } from "http";
 import net from "net";
-import path from "path";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { registerOAuthRoutes } from "./oauth";
 import { registerStorageProxy } from "./storageProxy";
@@ -50,9 +48,8 @@ async function startServer() {
   if (process.env.NODE_ENV === "development") {
     await setupVite(app, server);
   } else {
-    const distPath = path.resolve(process.cwd(), "dist", "public");
-    console.log(`[static] Serving static files from: ${distPath}`);
-    console.log(`[static] Directory exists: ${fs.existsSync(distPath)}`);
+    console.log(`[static] Starting production static file server`);
+    console.log(`[static] import.meta.url: ${import.meta.url}`);
     serveStatic(app);
   }
 
