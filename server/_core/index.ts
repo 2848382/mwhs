@@ -49,7 +49,6 @@ async function startServer() {
     await setupVite(app, server);
   } else {
     console.log(`[static] Starting production static file server`);
-    console.log(`[static] import.meta.url: ${import.meta.url}`);
     serveStatic(app);
   }
 
