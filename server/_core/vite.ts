@@ -49,12 +49,17 @@ export async function setupVite(app: Express, server: Server) {
 
 export function serveStatic(app: Express) {
   const distPath = path.resolve(process.cwd(), "dist", "public");
+  console.log(`[serveStatic] Resolved distPath: ${distPath}`);
+
   if (!fs.existsSync(distPath)) {
     console.error(
-      `Could not find the build directory: ${distPath}, make sure to build the client first`
+      `[serveStatic] ERROR: Build directory not found: ${distPath}. ` +
+        `Run the client build (e.g. "vite build") before starting the server in production mode.`
     );
+    return;
   }
 
+  console.log(`[serveStatic] Directory confirmed, registering static middleware`);
   app.use(express.static(distPath));
 
   // fall through to index.html if the file doesn't exist

@@ -1,7 +1,9 @@
 import "dotenv/config";
 import express from "express";
+import fs from "fs";
 import { createServer } from "http";
 import net from "net";
+import path from "path";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { registerOAuthRoutes } from "./oauth";
 import { registerStorageProxy } from "./storageProxy";
@@ -48,6 +50,9 @@ async function startServer() {
   if (process.env.NODE_ENV === "development") {
     await setupVite(app, server);
   } else {
+    const distPath = path.resolve(process.cwd(), "dist", "public");
+    console.log(`[static] Serving static files from: ${distPath}`);
+    console.log(`[static] Directory exists: ${fs.existsSync(distPath)}`);
     serveStatic(app);
   }
 
@@ -58,8 +63,8 @@ async function startServer() {
     console.log(`Port ${preferredPort} is busy, using port ${port} instead`);
   }
 
-  server.listen(port, () => {
-    console.log(`Server running on http://localhost:${port}/`);
+  server.listen(port, "0.0.0.0", () => {
+    console.log(`Server running on http://0.0.0.0:${port}/`);
   });
 }
 
