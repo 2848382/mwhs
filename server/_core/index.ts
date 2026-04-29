@@ -2,13 +2,25 @@ import "dotenv/config";
 import express from "express";
 import { createServer } from "http";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
+import { migrate } from "drizzle-orm/postgres-js/migrator";
 import { registerOAuthRoutes } from "./oauth";
 import { registerStorageProxy } from "./storageProxy";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
+import { getDb } from "../db";
 
 async function startServer() {
+  // Run DB migrations before starting the server
+  const db = await getDb();
+  if (db) {
+    console.log("[Database] Running migrations...");
+    await migrate(db, { migrationsFolder: "./drizzle" });
+    console.log("[Database] Migrations complete.");
+  } else {
+    console.warn("[Database] No database connection — skipping migrations.");
+  }
+
   const app = express();
   const server = createServer(app);
   // Configure body parser with larger size limit for file uploads
