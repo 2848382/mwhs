@@ -1,6 +1,6 @@
 {
   "version": "5",
-  "dialect": "mysql",
+  "dialect": "postgresql",
   "id": "b912da38-e5df-433c-97a7-5457f6f34c51",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {

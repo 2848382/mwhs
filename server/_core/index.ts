@@ -15,8 +15,12 @@ async function startServer() {
   const db = await getDb();
   if (db) {
     console.log("[Database] Running migrations...");
-    await migrate(db, { migrationsFolder: "./drizzle" });
-    console.log("[Database] Migrations complete.");
+    try {
+      await migrate(db, { migrationsFolder: "./drizzle" });
+      console.log("[Database] Migrations complete.");
+    } catch (err) {
+      console.error("[Database] Migration failed — server will start anyway:", err);
+    }
   } else {
     console.warn("[Database] No database connection — skipping migrations.");
   }
