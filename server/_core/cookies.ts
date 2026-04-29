@@ -11,6 +11,9 @@ function isIpAddress(host: string) {
 function isSecureRequest(req: Request) {
   if (req.protocol === "https") return true;
 
+  // Detect Railway (and other reverse-proxy) HTTPS via x-forwarded-proto.
+  // The header may contain a comma-separated list when multiple proxies are
+  // chained (e.g. "https, http"), so we check each entry individually.
   const forwardedProto = req.headers["x-forwarded-proto"];
   if (!forwardedProto) return false;
 
@@ -39,10 +42,26 @@ export function getSessionCookieOptions(
   //       ? hostname
   //       : undefined;
 
+  // sameSite: "none" is required for cross-site cookie delivery, but the
+  // browser will silently reject any "none" cookie that is not also marked
+  // Secure.  We therefore always set secure: true when sameSite is "none",
+  // regardless of what the local protocol field reports.  Railway terminates
+  // TLS at its edge proxy and forwards requests over plain HTTP internally,
+  // so req.protocol is "http" even for genuine HTTPS connections — the
+  // x-forwarded-proto header is the authoritative signal, but forcing
+  // secure: true here is the safest default for a production deployment.
+  const sameSite = "none" as const;
+  const secure = sameSite === "none" ? true : isSecureRequest(req);
+
+  console.log(
+    `[Auth] Cookie options — sameSite: ${sameSite}, secure: ${secure}, ` +
+    `protocol: ${req.protocol}, x-forwarded-proto: ${req.headers["x-forwarded-proto"] ?? "(none)"}`
+  );
+
   return {
     httpOnly: true,
     path: "/",
-    sameSite: "none",
-    secure: isSecureRequest(req),
+    sameSite,
+    secure,
   };
 }
